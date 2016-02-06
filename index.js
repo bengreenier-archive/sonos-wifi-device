@@ -40,6 +40,7 @@ ds(deviceIp).on("change", function (host, status) {
             });
         }
     } else {
+        console.log("device missing");
         if (activeTimeout == null) {
             activeTimeout = setTimeout(function () {
                 active = false;
