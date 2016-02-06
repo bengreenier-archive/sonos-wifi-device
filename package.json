@@ -1,5 +1,5 @@
 {
-  "name": "sonos-arp",
+  "name": "sonos-wifi-device",
   "version": "1.0.0",
   "description": "trigger sonos pause/play based on pings",
   "main": "index.js",
