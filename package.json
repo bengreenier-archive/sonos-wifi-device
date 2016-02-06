@@ -1,0 +1,19 @@
+{
+  "name": "sonos-arp",
+  "version": "1.0.0",
+  "description": "trigger sonos pause/play based on pings",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo lolno"
+  },
+  "keywords": [
+    "sonos",
+    "ping"
+  ],
+  "author": "Ben Greenier",
+  "license": "ISC",
+  "dependencies": {
+    "device-status": "0.0.1",
+    "sonos": "^0.11.1"
+  }
+}
