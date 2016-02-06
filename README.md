@@ -21,7 +21,7 @@ clone this repo, `npm install`, `node index.js <ip>`, wait.
 ## Is this a perfect science?!
 
 No...of course not this is mostly hacky garbage that should be
-frowned upon. But I'm lazy and wanted to simulate TheRightWay__TM__
+frowned upon. But I'm lazy and wanted to simulate TheRightWay**TM**
 to solve this problem.
 
 # License
