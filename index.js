@@ -40,20 +40,22 @@ ds(deviceIp).on("change", function (host, status) {
             });
         }
     } else {
-        activeTimeout = setTimeout(function () {
-            active = false;
-            console.log("device inactive for 10 minutes");
-            if (sonosStatus) {
-                findSonos(function (device) {
-                    device.pause(function (err) {
-                        if (!err) {
-                            console.log("paused.");
-                        }
+        if (activeTimeout == null) {
+            activeTimeout = setTimeout(function () {
+                active = false;
+                console.log("device inactive for 10 minutes");
+                if (sonosStatus) {
+                    findSonos(function (device) {
+                        device.pause(function (err) {
+                            if (!err) {
+                                console.log("paused.");
+                            }
+                        });
                     });
-                });
-            }
-        }, 10 * 60 * 1000);
-        console.log("timeout set");
+                }
+            }, 10 * 60 * 1000);
+            console.log("timeout set");
+        }
     }
 });
 
