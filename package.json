@@ -4,7 +4,8 @@
   "description": "trigger sonos pause/play based on pings",
   "main": "index.js",
   "scripts": {
-    "test": "echo lolno"
+    "test": "echo lolno",
+    "start": "node index.js"
   },
   "keywords": [
     "sonos",
