@@ -5,7 +5,7 @@ var active = false;
 var activeTimeout = null;
 var sonosStatus = false;
 
-var deviceIp = process.argv[2];
+var deviceIp = process.argv[2] || process.env.DEVICE_IP;
 
 console.log("using "+deviceIp+" as device ip");
 
