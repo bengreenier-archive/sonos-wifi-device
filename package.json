@@ -16,5 +16,8 @@
   "dependencies": {
     "device-status": "0.0.1",
     "sonos": "^0.11.1"
+  },
+  "engines": {
+      "node": ">=5.0.x"
   }
 }
