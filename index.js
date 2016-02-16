@@ -1,75 +1,42 @@
 var ds = require('device-status');
-var sonos = require('sonos');
-var first = true;
-var active = false;
-var activeTimeout = null;
-var sonosStatus = false;
+var Fsm = require('./fsm');
 
-var deviceIp = process.argv[2] || process.env.DEVICE_IP;
+var deviceIp = process.argv[2] || process.env.DEVICE_IP || null;
+var timeoutDelay = 10*1000;
+
+if (!deviceIp) {
+    console.log("no deviceIp - exiting");
+    process.exit(-1);
+}
+
+deviceIp = deviceIp.replace(" ", "");
 
 console.log("using "+deviceIp+" as device ip");
 
-// get the state of sonos
-findSonos(function (device) {
-    device.getCurrentState(function (err, state) {
-        if (!err) {
-            sonosStatus = state === "playing" ? true : false;
-            console.log("looks like sonos is currently"+(sonosStatus ? "" : " not")+" playing");
+var instance = new Fsm(function setup() {
+    console.log("initial sonos reading: "+instance.getInitialState());
+    
+    var deviceState = false;
+    ds(deviceIp).on("change", function (h, status) {
+        // if we're not playing and our edge goes from missing to found
+        // and we didn't start not playing, we play - yay logic
+        if (instance.getInitialState() && !instance.getState() && !deviceState && status) {
+            console.log("missing => found && !playing - triggering toggle");
+            instance.toggle();
+        }
+        
+        if (deviceState !== status) {
+            console.log("device state changed from "+deviceState+" to "+status);
+            deviceState = status;
         }
     });
-});
 
-// mount device stuff
-ds(deviceIp).on("change", function (host, status) {
-    if (first) {
-        console.log("first result, ignoring...");
-        first = false;
-        return;
-    }
-    if (status) {
-        console.log("device found");
-        active = true;
-        clearTimeout(activeTimeout);
-        if (!sonosStatus) {
-            findSonos(function (device) {
-                device.play(function (err) {
-                    if (!err) {
-                        console.log("playing.");
-                    }
-                });
-            });
+    setInterval(function () {
+        // if we're playing and the device has been missing for >timeoutDelay
+        // we pause
+        if (!deviceState && instance.getState()) {
+            console.log("found => missing && playing - triggering toggle");
+            instance.toggle();
         }
-    } else {
-        console.log("device missing");
-        if (activeTimeout == null) {
-            activeTimeout = setTimeout(function () {
-                active = false;
-                console.log("device inactive for 10 minutes");
-                if (sonosStatus) {
-                    findSonos(function (device) {
-                        device.pause(function (err) {
-                            if (!err) {
-                                console.log("paused.");
-                            }
-                        });
-                    });
-                }
-            }, 10 * 60 * 1000);
-            console.log("timeout set");
-        }
-    }
+    }, timeoutDelay);
 });
-
-//helper to get the `main` sonos instance
-function findSonos(cb) {
-    sonos.search(function(device) {
-        // device is an instance of sonos.Sonos
-        device.currentTrack(function (err, track) {
-            // we determine the device to use by which device
-            // has a track.title property
-            if (!err && typeof(track.title) !== "undefined") {
-                cb(device);
-            }
-        });
-    });
-}
