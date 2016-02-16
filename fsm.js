@@ -25,26 +25,42 @@ function Fsm(setupCb) {
     });
 }
 
+Fsm.prototype.init = function (setupCb) {
+    var self = this;
+    if (this._isSetup) {
+        this._device.getCurrentState(function (err, state) {
+            if (!err) {
+                self._state = (state === "playing" ? true : false);
+                self._initialState = (state === "playing" ? true : false);
+                if (typeof(setupCb) === "function") {
+                    setupCb(self);
+                }
+            }
+        });
+    }
+}
+
 // returns true if we're trying to toggle
 // false if we don't even try
 // note - this doesn't mean we're able to toggle
 Fsm.prototype.toggle = function () {
     if (!this._isSetup || this._statePending) return false;
     
-    if (this._state) {
+    var self = this;
+    if (!this._state) {
         this._statePending = true;
         this._device.play(function (err) {
             if (!err) {
-                this._state = true;
-                this._statePending = false;
+                self._state = true;
+                self._statePending = false;
             }
         });
     } else {
         this._statePending = true;
         this._device.pause(function (err) {
             if (!err) {
-                this._state = false;
-                this._statePending = false;
+                self._state = false;
+                self._statePending = false;
             }
         });
     }
